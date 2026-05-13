@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>University Management System</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef3f8;
+            text-align: center;
+        }
+        
+        h1 {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .card {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            width: 260px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+        
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 8px;
+        }
+        
+        button {
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .delete-btn {
+            background: red;
+        }
+        
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th,
+        td {
+            border: 1px solid black;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎓 University Management System</h1>
+
+    <div class="container">
+
+        <!-- Student -->
+        <div class="card">
+            <h2>Add Student</h2>
+            <input type="text" id="sname" placeholder="Student Name">
+            <input type="text" id="sid" placeholder="Student ID">
+            <button onclick="addStudent()">Add</button>
+        </div>
+
+        <!-- Teacher -->
+        <div class="card">
+            <h2>Add Teacher</h2>
+            <input type="text" id="tname" placeholder="Teacher Name">
+            <input type="text" id="tid" placeholder="Teacher ID">
+            <button onclick="addTeacher()">Add</button>
+        </div>
+
+        <!-- Course -->
+        <div class="card">
+            <h2>Add Course</h2>
+            <input type="text" id="cname" placeholder="Course Name">
+            <input type="text" id="ccode" placeholder="Course Code">
+            <button onclick="addCourse()">Add</button>
+        </div>
+
+        <!-- Enrollment -->
+        <div class="card">
+            <h2>Enroll Student</h2>
+            <input type="text" id="esname" placeholder="Student Name">
+            <input type="text" id="ecourse" placeholder="Course Name">
+            <button onclick="enroll()">Enroll</button>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h2>👨‍🎓 Students</h2>
+    <table id="studentTable">
+        <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+    <h2>👩‍🏫 Teachers</h2>
+    <table id="teacherTable">
+        <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+    <h2>📚 Courses</h2>
+    <table id="courseTable">
+        <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+    <h2>📝 Enrollments</h2>
+    <table id="enrollTable">
+        <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+    <script>
+        let students = JSON.parse(localStorage.getItem("uni_students")) || [];
+        let teachers = JSON.parse(localStorage.getItem("uni_teachers")) || [];
+        let courses = JSON.parse(localStorage.getItem("uni_courses")) || [];
+        let enrollments = JSON.parse(localStorage.getItem("uni_enrollments")) || [];
+
+        function addStudent() {
+            let name = sname.value;
+            let id = sid.value;
+
+            if (name && id) {
+                students.push({
+                    name,
+                    id
+                });
+                localStorage.setItem("uni_students", JSON.stringify(students));
+                displayStudents();
+            }
+        }
+
+        function addTeacher() {
+            let name = tname.value;
+            let id = tid.value;
+
+            if (name && id) {
+                teachers.push({
+                    name,
+                    id
+                });
+                localStorage.setItem("uni_teachers", JSON.stringify(teachers));
+                displayTeachers();
+            }
+        }
+
+        function addCourse() {
+            let name = cname.value;
+            let code = ccode.value;
+
+            if (name && code) {
+                courses.push({
+                    name,
+                    code
+                });
+                localStorage.setItem("uni_courses", JSON.stringify(courses));
+                displayCourses();
+            }
+        }
+
+        function enroll() {
+            let student = esname.value;
+            let course = ecourse.value;
+
+            if (student && course) {
+                enrollments.push({
+                    student,
+                    course
+                });
+                localStorage.setItem("uni_enrollments", JSON.stringify(enrollments));
+                displayEnrollments();
+            }
+        }
+
+        function deleteItem(arr, index, key) {
+            arr.splice(index, 1);
+            localStorage.setItem(key, JSON.stringify(arr));
+            loadAll();
+        }
+
+        function displayStudents() {
+            let table = document.getElementById("studentTable");
+            table.innerHTML = "<tr><th>Name</th><th>ID</th><th>Action</th></tr>";
+            students.forEach((s, i) => {
+                table.innerHTML += `<tr>
+      <td>${s.name}</td>
+      <td>${s.id}</td>
+      <td><button class="delete-btn" onclick="deleteItem(students,${i},'uni_students')">Delete</button></td>
+    </tr>`;
+            });
+        }
+
+        function displayTeachers() {
+            let table = document.getElementById("teacherTable");
+            table.innerHTML = "<tr><th>Name</th><th>ID</th><th>Action</th></tr>";
+            teachers.forEach((t, i) => {
+                table.innerHTML += `<tr>
+      <td>${t.name}</td>
+      <td>${t.id}</td>
+      <td><button class="delete-btn" onclick="deleteItem(teachers,${i},'uni_teachers')">Delete</button></td>
+    </tr>`;
+            });
+        }
+
+        function displayCourses() {
+            let table = document.getElementById("courseTable");
+            table.innerHTML = "<tr><th>Name</th><th>Code</th><th>Action</th></tr>";
+            courses.forEach((c, i) => {
+                table.innerHTML += `<tr>
+      <td>${c.name}</td>
+      <td>${c.code}</td>
+      <td><button class="delete-btn" onclick="deleteItem(courses,${i},'uni_courses')">Delete</button></td>
+    </tr>`;
+            });
+        }
+
+        function displayEnrollments() {
+            let table = document.getElementById("enrollTable");
+            table.innerHTML = "<tr><th>Student</th><th>Course</th><th>Action</th></tr>";
+            enrollments.forEach((e, i) => {
+                table.innerHTML += `<tr>
+      <td>${e.student}</td>
+      <td>${e.course}</td>
+      <td><button class="delete-btn" onclick="deleteItem(enrollments,${i},'uni_enrollments')">Delete</button></td>
+    </tr>`;
+            });
+        }
+
+        function loadAll() {
+            displayStudents();
+            displayTeachers();
+            displayCourses();
+            displayEnrollments();
+        }
+
+        loadAll();
+    </script>
+
+</body>
+
+</html>
